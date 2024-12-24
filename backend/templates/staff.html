@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard | TravelMax</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/staff.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="active">
+            <div class="sidebar-header">
+                <img src="/static/images/logo.png" alt="TravelMax" class="logo">
+            </div>
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="#"><i class="bi bi-grid-1x2-fill"></i> Dashboards</a>
+                </li>
+                <li>
+                    <a href="#"><i class="bi bi-window-stack"></i> Apps</a>
+                </li>
+                <li>
+                    <a href="#"><i class="bi bi-file-earmark-text"></i> Pages</a>
+                </li>
+                <li>
+                    <a href="#"><i class="bi bi-box"></i> Components</a>
+                </li>
+                <li>
+                    <a href="#"><i class="bi bi-grid-3x3-gap"></i> Layouts</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Top Navigation -->
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="#">HOME</a></li>
+                                <li class="breadcrumb-item active">STAFF</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="listing-dropdown-container">
+                            <a href="#" class="btn btn-primary" id="newListingBtn">
+                                <i class="bi bi-plus-lg"></i> New Listing
+                            </a>
+                            <div class="listing-dropdown-menu" id="listingDropdown">
+                                <a href="#" class="listing-dropdown-item">
+                                    <i class="bi bi-globe"></i> Add new Tour
+                                </a>
+                                <a href="#" class="listing-dropdown-item">
+                                    <i class="bi bi-activity"></i> Add new Activity
+                                </a>
+                                <a href="#" class="listing-dropdown-item">
+                                    <i class="bi bi-ticket-perforated"></i> Add new Ticket Event
+                                </a>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" id="addStaffBtn">
+                            <i class="bi bi-plus-lg"></i> Add Staff
+                        </button>
+                        <div class="user-profile d-flex align-items-center gap-2">
+                            <i class="bi bi-bell"></i>
+                            <img src="/static/images/avatar.jpg" alt="User" class="avatar">
+                            <span>Adrian D.</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="container-fluid mt-4">
+                <!-- Stats Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle text-muted">Budget</h6>
+                                        <div class="d-flex align-items-baseline">
+                                            <h3 class="mb-0">$24,000</h3>
+                                            <span class="text-muted ms-2">/ $50,000</span>
+                                        </div>
+                                    </div>
+                                    <div class="stats-icon budget">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </div>
+                                </div>
+                                <div class="progress mt-3" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 48%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle text-muted">Current Target</h6>
+                                        <div class="d-flex align-items-baseline">
+                                            <h3 class="mb-0">$50,000</h3>
+                                            <span class="badge bg-primary ms-2">2018</span>
+                                        </div>
+                                    </div>
+                                    <div class="stats-icon target">
+                                        <i class="bi bi-bullseye"></i>
+                                    </div>
+                                </div>
+                                <div class="progress mt-3" style="height: 6px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-subtitle text-muted">Top Grossing</h6>
+                                        <div class="d-flex align-items-baseline">
+                                            <h3 class="mb-0">$13,531</h3>
+                                            <i class="bi bi-arrow-up-short text-success ms-2"></i>
+                                        </div>
+                                    </div>
+                                    <div class="stats-icon grossing">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                    </div>
+                                </div>
+                                <div class="progress mt-3" style="height: 6px;">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings Chart -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="card-title mb-0">Earnings</h5>
+                            <div class="date-range">13/03/2018 to 20/03/2018</div>
+                        </div>
+                        <canvas id="earningsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Staff Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="d-flex gap-3 align-items-center">
+                                <input type="text" class="form-control" placeholder="Type a name">
+                                <select class="form-select">
+                                    <option>All Roles</option>
+                                </select>
+                                <select class="form-select">
+                                    <option>Made a Purchase?</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" class="form-check-input">
+                                        </th>
+                                        <th>Employee</th>
+                                        <th>Current Employer</th>
+                                        <th>Projects</th>
+                                        <th>Status</th>
+                                        <th>Last Activity</th>
+                                        <th>Earnings</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Sample row -->
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input">
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <img src="/static/images/avatar.jpg" alt="" class="avatar">
+                                                <span>Michael Smith</span>
+                                            </div>
+                                        </td>
+                                        <td>Black Ops</td>
+                                        <td>12</td>
+                                        <td><span class="badge bg-warning">ADMIN</span></td>
+                                        <td>3 days ago</td>
+                                        <td>$12,402</td>
+                                        <td>
+                                            <button class="btn btn-icon"><i class="bi bi-three-dots-vertical"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end mt-3">
+                            <div class="pagination-info">15 of 1,430</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/staff.js"></script>
+</body>
+</html>
