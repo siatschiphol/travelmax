@@ -18,22 +18,73 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
   const [tourForm, setTourForm] = useState<TourFormData>(() => {
     console.log('Initializing form with data:', initialData)
     return {
+      // Basic Info
       title: initialData?.title || '',
+      slug: initialData?.slug || '',
+      status: initialData?.status || 'draft',
+      provider_id: initialData?.provider_id || '',
       categories: Array.isArray(initialData?.details?.categories) ? initialData.details.categories : [],
+      
+      // Descriptions
       shortDescription: initialData?.details?.description?.short || '',
       fullDescription: initialData?.details?.description?.full || '',
       importantInformation: initialData?.details?.description?.important_information || '',
+      
+      // Pricing
+      base_price: initialData?.details?.pricing?.base_price || 0,
+      currency: initialData?.details?.pricing?.currency || 'USD',
+      
+      // Items
       included: Array.isArray(initialData?.details?.included_items) ? initialData.details.included_items.join('\n') : '',
       excluded: Array.isArray(initialData?.details?.excluded_items) ? initialData.details.excluded_items.join('\n') : '',
-      price: initialData?.details?.pricing?.base_price || 0,
+      
+      // Location
+      location_data: {
+        country: initialData?.details?.location_data?.country || '',
+        city: initialData?.details?.location_data?.city || '',
+        coordinates: {
+          latitude: initialData?.details?.location_data?.coordinates?.latitude || 0,
+          longitude: initialData?.details?.location_data?.coordinates?.longitude || 0
+        },
+        region: initialData?.details?.location_data?.region || ''
+      },
+      
+      // Meeting Point
+      meeting_point: {
+        address: initialData?.details?.meeting_point?.address || '',
+        instructions: initialData?.details?.meeting_point?.instructions || ''
+      },
+      
+      // Requirements
+      requirements: Array.isArray(initialData?.details?.requirements) ? initialData.details.requirements : [],
+      
+      // Availability
+      availability: {
+        seasonal_dates: Array.isArray(initialData?.details?.availability?.seasonal_dates) 
+          ? initialData.details.availability.seasonal_dates 
+          : [],
+        blackout_dates: Array.isArray(initialData?.details?.availability?.blackout_dates) 
+          ? initialData.details.availability.blackout_dates 
+          : [],
+        capacity: {
+          max_tours: initialData?.details?.capacity?.max_tours || 1,
+          max_guests: initialData?.details?.capacity?.max_guests || 1
+        }
+      },
+      
+      // Schedule (keeping existing scheduling system)
       schedule: '',
       scheduleDates: Array.isArray(initialData?.details?.schedule?.availability?.specific_dates) 
         ? initialData.details.schedule.availability.specific_dates.map((d: string) => new Date(d)) 
         : [],
-      maxToursAtTime: initialData?.details?.capacity?.max_tours || 1,
-      maxGuests: initialData?.details?.capacity?.max_guests || 1,
-      youtubeLink: initialData?.details?.media?.youtube_url || '',
-      images: []
+      
+      // Media
+      media: {
+        images: [],
+        videos: Array.isArray(initialData?.details?.media?.videos) ? initialData.details.media.videos : [],
+        virtual_tours: Array.isArray(initialData?.details?.media?.virtual_tours) ? initialData.details.media.virtual_tours : [],
+        youtube_link: initialData?.details?.media?.youtube_url || ''
+      }
     }
   })
 
@@ -64,19 +115,18 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
       }
 
       // Upload images to Supabase Storage
-      const imageUrls = await uploadTourImages(tourForm.images)
+      const imageUrls = await uploadTourImages(tourForm.media.images)
 
       // Prepare the experience data
       const experienceData = {
-        title: tourForm.title,
-        slug: generateSlug(tourForm.title),
-        type: 'tour',
-        status: 'published',
-        created_by: user.id,
         details: {
+          title: tourForm.title,
+          slug: generateSlug(tourForm.title),
+          type: 'tour',
+          status: tourForm.status,
           pricing: {
-            base_price: parseFloat(tourForm.price.toString()),
-            currency: 'USD'
+            base_price: parseFloat(tourForm.base_price.toString()),
+            currency: tourForm.currency
           },
           description: {
             short: tourForm.shortDescription,
@@ -87,19 +137,19 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
             gallery_urls: mode === 'edit' 
               ? [...(initialData?.details?.media?.gallery_urls || []), ...imageUrls]
               : imageUrls,
-            youtube_url: tourForm.youtubeLink
+            youtube_url: tourForm.media.youtube_link
           },
           included_items: tourForm.included.split('\n').filter(item => item.trim()),
           excluded_items: tourForm.excluded.split('\n').filter(item => item.trim()),
           categories: tourForm.categories,
+          location_data: tourForm.location_data,
+          meeting_point: tourForm.meeting_point,
+          requirements: tourForm.requirements,
+          availability: tourForm.availability,
           schedule: {
             availability: {
               specific_dates: tourForm.scheduleDates.map(date => date.toISOString().split('T')[0])
             }
-          },
-          capacity: {
-            max_tours: Math.max(1, parseInt(tourForm.maxToursAtTime.toString())),
-            max_guests: Math.max(1, parseInt(tourForm.maxGuests.toString()))
           }
         }
       }
@@ -135,14 +185,14 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
     const files = Array.from(e.target.files || [])
     setTourForm(prev => ({
       ...prev,
-      images: [...prev.images, ...files]
+      media: { ...prev.media, images: [...prev.media.images, ...files] }
     }))
   }
 
   const removeImage = (index: number) => {
     setTourForm(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      media: { ...prev.media, images: prev.media.images.filter((_, i) => i !== index) }
     }))
   }
 
@@ -389,19 +439,202 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
 
         {/* Price */}
         <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="base_price" className="block text-sm font-medium text-gray-700">
             Price (USD)
           </label>
           <input
             type="number"
-            id="price"
-            value={tourForm.price}
-            onChange={(e) => setTourForm({ ...tourForm, price: parseFloat(e.target.value) })}
+            id="base_price"
+            value={tourForm.base_price}
+            onChange={(e) => setTourForm({ ...tourForm, base_price: parseFloat(e.target.value) })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
             min="0"
             step="0.01"
             required
           />
+        </div>
+
+        {/* Location Data */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-medium text-gray-900">Location Information</h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+                Country
+              </label>
+              <input
+                type="text"
+                id="country"
+                value={tourForm.location_data.country}
+                onChange={(e) => setTourForm({ 
+                  ...tourForm, 
+                  location_data: { 
+                    ...tourForm.location_data, 
+                    country: e.target.value 
+                  } 
+                })}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                City
+              </label>
+              <input
+                type="text"
+                id="city"
+                value={tourForm.location_data.city}
+                onChange={(e) => setTourForm({ 
+                  ...tourForm, 
+                  location_data: { 
+                    ...tourForm.location_data, 
+                    city: e.target.value 
+                  } 
+                })}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="region" className="block text-sm font-medium text-gray-700">
+                Region
+              </label>
+              <input
+                type="text"
+                id="region"
+                value={tourForm.location_data.region}
+                onChange={(e) => setTourForm({ 
+                  ...tourForm, 
+                  location_data: { 
+                    ...tourForm.location_data, 
+                    region: e.target.value 
+                  } 
+                })}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                required
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label htmlFor="latitude" className="block text-sm font-medium text-gray-700">
+                Latitude
+              </label>
+              <input
+                type="number"
+                id="latitude"
+                value={tourForm.location_data.coordinates.latitude}
+                onChange={(e) => setTourForm({ 
+                  ...tourForm, 
+                  location_data: { 
+                    ...tourForm.location_data, 
+                    coordinates: {
+                      ...tourForm.location_data.coordinates,
+                      latitude: parseFloat(e.target.value)
+                    }
+                  } 
+                })}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                step="0.000001"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="longitude" className="block text-sm font-medium text-gray-700">
+                Longitude
+              </label>
+              <input
+                type="number"
+                id="longitude"
+                value={tourForm.location_data.coordinates.longitude}
+                onChange={(e) => setTourForm({ 
+                  ...tourForm, 
+                  location_data: { 
+                    ...tourForm.location_data, 
+                    coordinates: {
+                      ...tourForm.location_data.coordinates,
+                      longitude: parseFloat(e.target.value)
+                    }
+                  } 
+                })}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                step="0.000001"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Meeting Point */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-medium text-gray-900">Meeting Point</h3>
+          <div>
+            <label htmlFor="meeting_address" className="block text-sm font-medium text-gray-700">
+              Meeting Address
+            </label>
+            <input
+              type="text"
+              id="meeting_address"
+              value={tourForm.meeting_point.address}
+              onChange={(e) => setTourForm({ 
+                ...tourForm, 
+                meeting_point: { 
+                  ...tourForm.meeting_point, 
+                  address: e.target.value 
+                } 
+              })}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="meeting_instructions" className="block text-sm font-medium text-gray-700">
+              Meeting Instructions
+            </label>
+            <textarea
+              id="meeting_instructions"
+              rows={4}
+              value={tourForm.meeting_point.instructions}
+              onChange={(e) => setTourForm({ 
+                ...tourForm, 
+                meeting_point: { 
+                  ...tourForm.meeting_point, 
+                  instructions: e.target.value 
+                } 
+              })}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Requirements */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-medium text-gray-900">Requirements</h3>
+          <div>
+            <label htmlFor="requirements" className="block text-sm font-medium text-gray-700">
+              Tour Requirements
+            </label>
+            <textarea
+              id="requirements"
+              rows={4}
+              value={tourForm.requirements.join('\n')}
+              onChange={(e) => {
+                const requirements = e.target.value.split('\n').filter(item => item.trim());
+                setTourForm({ 
+                  ...tourForm, 
+                  requirements 
+                });
+              }}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm font-mono"
+              placeholder="Minimum age: 18&#10;Physical fitness level: Moderate&#10;Required equipment: Hiking shoes"
+              required
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Enter each requirement on a new line
+            </p>
+          </div>
         </div>
 
         {/* Schedule Dates */}
@@ -553,8 +786,8 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
             <input
               type="number"
               id="maxToursAtTime"
-              value={tourForm.maxToursAtTime}
-              onChange={(e) => setTourForm({ ...tourForm, maxToursAtTime: parseInt(e.target.value) })}
+              value={tourForm.availability.capacity.max_tours}
+              onChange={(e) => setTourForm({ ...tourForm, availability: { ...tourForm.availability, capacity: { ...tourForm.availability.capacity, max_tours: parseInt(e.target.value) } } })}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
               min="1"
               required
@@ -567,12 +800,184 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
             <input
               type="number"
               id="maxGuests"
-              value={tourForm.maxGuests}
-              onChange={(e) => setTourForm({ ...tourForm, maxGuests: parseInt(e.target.value) })}
+              value={tourForm.availability.capacity.max_guests}
+              onChange={(e) => setTourForm({ ...tourForm, availability: { ...tourForm.availability, capacity: { ...tourForm.availability.capacity, max_guests: parseInt(e.target.value) } } })}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
               min="1"
               required
             />
+          </div>
+        </div>
+
+        {/* Seasonal Dates */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-medium text-gray-900">Seasonal Availability</h3>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Seasonal Dates
+            </label>
+            <div className="mt-2 space-y-4">
+              {tourForm.availability.seasonal_dates.map((season, index) => (
+                <div key={index} className="flex items-center gap-4">
+                  <div className="flex-1 grid grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor={`season-start-${index}`} className="block text-sm font-medium text-gray-700">
+                        Start Date
+                      </label>
+                      <input
+                        type="date"
+                        id={`season-start-${index}`}
+                        value={season.start_date}
+                        onChange={(e) => {
+                          const newSeasons = [...tourForm.availability.seasonal_dates];
+                          newSeasons[index] = { ...season, start_date: e.target.value };
+                          setTourForm({
+                            ...tourForm,
+                            availability: {
+                              ...tourForm.availability,
+                              seasonal_dates: newSeasons
+                            }
+                          });
+                        }}
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`season-end-${index}`} className="block text-sm font-medium text-gray-700">
+                        End Date
+                      </label>
+                      <input
+                        type="date"
+                        id={`season-end-${index}`}
+                        value={season.end_date}
+                        onChange={(e) => {
+                          const newSeasons = [...tourForm.availability.seasonal_dates];
+                          newSeasons[index] = { ...season, end_date: e.target.value };
+                          setTourForm({
+                            ...tourForm,
+                            availability: {
+                              ...tourForm.availability,
+                              seasonal_dates: newSeasons
+                            }
+                          });
+                        }}
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newSeasons = tourForm.availability.seasonal_dates.filter((_, i) => i !== index);
+                      setTourForm({
+                        ...tourForm,
+                        availability: {
+                          ...tourForm.availability,
+                          seasonal_dates: newSeasons
+                        }
+                      });
+                    }}
+                    className="mt-6 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  const today = new Date();
+                  const nextMonth = new Date(today);
+                  nextMonth.setMonth(today.getMonth() + 1);
+                  
+                  setTourForm({
+                    ...tourForm,
+                    availability: {
+                      ...tourForm.availability,
+                      seasonal_dates: [
+                        ...tourForm.availability.seasonal_dates,
+                        {
+                          start_date: today.toISOString().split('T')[0],
+                          end_date: nextMonth.toISOString().split('T')[0]
+                        }
+                      ]
+                    }
+                  });
+                }}
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Add Season
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Blackout Dates */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-medium text-gray-900">Blackout Dates</h3>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Unavailable Dates
+            </label>
+            <div className="mt-2 space-y-4">
+              {tourForm.availability.blackout_dates.map((date, index) => (
+                <div key={index} className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => {
+                        const newDates = [...tourForm.availability.blackout_dates];
+                        newDates[index] = e.target.value;
+                        setTourForm({
+                          ...tourForm,
+                          availability: {
+                            ...tourForm.availability,
+                            blackout_dates: newDates
+                          }
+                        });
+                      }}
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newDates = tourForm.availability.blackout_dates.filter((_, i) => i !== index);
+                      setTourForm({
+                        ...tourForm,
+                        availability: {
+                          ...tourForm.availability,
+                          blackout_dates: newDates
+                        }
+                      });
+                    }}
+                    className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  const today = new Date();
+                  setTourForm({
+                    ...tourForm,
+                    availability: {
+                      ...tourForm.availability,
+                      blackout_dates: [
+                        ...tourForm.availability.blackout_dates,
+                        today.toISOString().split('T')[0]
+                      ]
+                    }
+                  });
+                }}
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Add Blackout Date
+              </button>
+            </div>
           </div>
         </div>
 
@@ -584,8 +989,8 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
           <input
             type="url"
             id="youtubeLink"
-            value={tourForm.youtubeLink}
-            onChange={(e) => setTourForm({ ...tourForm, youtubeLink: e.target.value })}
+            value={tourForm.media.youtube_link}
+            onChange={(e) => setTourForm({ ...tourForm, media: { ...tourForm.media, youtube_link: e.target.value } })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
             placeholder="https://www.youtube.com/watch?v=..."
           />
@@ -623,9 +1028,9 @@ export default function TourForm({ initialData, tourId, mode }: TourFormProps) {
           </div>
 
           {/* Image Preview Grid */}
-          {tourForm.images.length > 0 && (
+          {tourForm.media.images.length > 0 && (
             <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-              {tourForm.images.map((image, index) => (
+              {tourForm.media.images.map((image, index) => (
                 <div key={index} className="relative group aspect-square">
                   <Image
                     src={URL.createObjectURL(image)}

@@ -5,12 +5,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Edit, Trash2, Plus, Eye, Search, Filter, ArrowUpDown } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { deleteListing, fetchListings } from './actions'
+import { deleteExperience, fetchExperiences } from './actions'
 import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal'
 
-export default function ListingsPage() {
+export default function ExperiencesPage() {
   const router = useRouter()
-  const [listings, setListings] = useState([])
+  const [experiences, setExperiences] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -18,25 +18,25 @@ export default function ListingsPage() {
   const [sortDirection, setSortDirection] = useState('desc')
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [listingToDelete, setListingToDelete] = useState<{ id: string, title: string } | null>(null)
+  const [experienceToDelete, setExperienceToDelete] = useState<{ id: string, title: string } | null>(null)
 
   useEffect(() => {
-    loadListings()
+    loadExperiences()
   }, [sortField, sortDirection])
 
-  async function loadListings() {
+  async function loadExperiences() {
     try {
       setLoading(true)
-      const result = await fetchListings(sortField, sortDirection)
+      const result = await fetchExperiences(sortField, sortDirection)
       
       if (result.success) {
-        setListings(result.data || [])
+        setExperiences(result.data || [])
       } else {
-        console.error('Error fetching listings:', result.error)
-        alert(result.error || 'Failed to fetch listings')
+        console.error('Error fetching experiences:', result.error)
+        alert(result.error || 'Failed to fetch experiences')
       }
     } catch (error) {
-      console.error('Error loading listings:', error)
+      console.error('Error loading experiences:', error)
     } finally {
       setLoading(false)
     }
@@ -44,32 +44,32 @@ export default function ListingsPage() {
 
   const handleDeleteClick = (id: string, title: string) => {
     console.log('Deleting:', { id, title });
-    setListingToDelete({ id, title });
+    setExperienceToDelete({ id, title });
     setDeleteModalOpen(true);
   }
 
   const handleDelete = async () => {
-    if (!listingToDelete) return;
+    if (!experienceToDelete) return;
     
     try {
-      setDeleteLoading(listingToDelete.id);
-      console.log('Deleting listing:', listingToDelete);
+      setDeleteLoading(experienceToDelete.id);
+      console.log('Deleting experience:', experienceToDelete);
       
-      const result = await deleteListing(listingToDelete.id);
+      const result = await deleteExperience(experienceToDelete.id);
       console.log('Delete result:', result);
       
       if (result.success) {
         // Remove the deleted item from the local state
-        setListings(prev => prev.filter(item => item.id !== listingToDelete.id));
+        setExperiences(prev => prev.filter(item => item.id !== experienceToDelete.id));
         setDeleteModalOpen(false);
-        setListingToDelete(null);
+        setExperienceToDelete(null);
         
-        // Force a router refresh and refetch listings
+        // Force a router refresh and refetch experiences
         router.refresh();
-        await loadListings();
+        await loadExperiences();
       } else {
         console.error('Delete error:', result.error);
-        alert(result.error || 'Failed to delete listing. Please try again.');
+        alert(result.error || 'Failed to delete experience. Please try again.');
       }
     } catch (error: any) {
       console.error('Error in delete handler:', error);
@@ -88,10 +88,10 @@ export default function ListingsPage() {
     }
   }
 
-  const filteredListings = listings.filter(listing => {
-    const matchesSearch = listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      listing.details?.description?.short?.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || listing.status === statusFilter
+  const filteredExperiences = experiences.filter(experience => {
+    const matchesSearch = experience.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      experience.details?.description?.short?.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesStatus = statusFilter === 'all' || experience.status === statusFilter
     return matchesSearch && matchesStatus
   })
 
@@ -100,13 +100,13 @@ export default function ListingsPage() {
       <div className="p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-semibold text-gray-900">Listings</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Experiences</h1>
             <Link
-              href="/admin/tours/new"
+              href="/admin/experiences/new"
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-4 h-4 mr-2" />
-              New Tour
+              New Experience
             </Link>
           </div>
 
@@ -118,7 +118,7 @@ export default function ListingsPage() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
-                    placeholder="Search listings..."
+                    placeholder="Search experiences..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
@@ -141,22 +141,22 @@ export default function ListingsPage() {
           <div className="bg-white rounded-lg shadow">
             {loading ? (
               <div className="text-center py-12">Loading...</div>
-            ) : filteredListings.length === 0 ? (
+            ) : filteredExperiences.length === 0 ? (
               <div className="text-center py-12">
-                <h3 className="mt-2 text-sm font-semibold text-gray-900">No listings found</h3>
+                <h3 className="mt-2 text-sm font-semibold text-gray-900">No experiences found</h3>
                 <p className="mt-1 text-sm text-gray-500">
                   {searchQuery || statusFilter !== 'all' 
                     ? 'Try adjusting your filters'
-                    : 'Get started by creating a new tour listing.'}
+                    : 'Get started by creating a new experience.'}
                 </p>
                 {!searchQuery && statusFilter === 'all' && (
                   <div className="mt-6">
                     <Link
-                      href="/admin/tours/new"
+                      href="/admin/experiences/new"
                       className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      New Tour
+                      New Experience
                     </Link>
                   </div>
                 )}
@@ -205,15 +205,15 @@ export default function ListingsPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredListings.map((listing) => (
-                      <tr key={listing.id} className="hover:bg-gray-50">
+                    {filteredExperiences.map((experience) => (
+                      <tr key={experience.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10 relative">
-                              {listing.details?.media?.gallery_urls?.[0] ? (
+                              {experience.details?.media?.gallery_urls?.[0] ? (
                                 <Image
-                                  src={listing.details.media.gallery_urls[0]}
-                                  alt={`Tour: ${listing.title}`}
+                                  src={experience.details.media.gallery_urls[0]}
+                                  alt={`Experience: ${experience.title}`}
                                   width={40}
                                   height={40}
                                   className="rounded-lg object-cover"
@@ -221,8 +221,8 @@ export default function ListingsPage() {
                               ) : (
                                 <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
                                   <Image
-                                    src="/placeholder-tour.png"
-                                    alt="Tour placeholder"
+                                    src="/placeholder-experience.png"
+                                    alt="Experience placeholder"
                                     width={40}
                                     height={40}
                                     className="rounded-lg object-cover opacity-50"
@@ -232,52 +232,52 @@ export default function ListingsPage() {
                             </div>
                             <div className="ml-4">
                               <div className="text-sm font-medium text-gray-900">
-                                {listing.title}
+                                {experience.title}
                               </div>
                               <div className="text-sm text-gray-500">
-                                {listing.details.description?.short}
+                                {experience.details.description?.short}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="capitalize">{listing.type}</span>
+                          <span className="capitalize">{experience.type}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          ${listing.details.pricing?.base_price}
+                          ${experience.details.pricing?.base_price}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                            ${listing.status === 'published' ? 'bg-green-100 text-green-800' : 
-                              listing.status === 'draft' ? 'bg-gray-100 text-gray-800' : 
+                            ${experience.status === 'published' ? 'bg-green-100 text-green-800' : 
+                              experience.status === 'draft' ? 'bg-gray-100 text-gray-800' : 
                               'bg-red-100 text-red-800'}`}
                           >
-                            {listing.status}
+                            {experience.status}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(listing.created_at).toLocaleDateString()}
+                          {new Date(experience.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end gap-2">
                             <Link
-                              href={`/tours/${listing.slug}`}
+                              href={`/experiences/${experience.slug}`}
                               className="text-gray-400 hover:text-gray-500"
                             >
                               <Eye className="w-5 h-5" />
                             </Link>
                             <Link
-                              href={`/admin/tours/${listing.id}/edit`}
+                              href={`/admin/experiences/${experience.id}/edit`}
                               className="text-blue-400 hover:text-blue-500"
                             >
                               <Edit className="w-5 h-5" />
                             </Link>
                             <button
-                              onClick={() => handleDeleteClick(listing.id, listing.title)}
+                              onClick={() => handleDeleteClick(experience.id, experience.title)}
                               className="text-gray-400 hover:text-red-600"
-                              disabled={deleteLoading === listing.id}
+                              disabled={deleteLoading === experience.id}
                             >
-                              {deleteLoading === listing.id ? (
+                              {deleteLoading === experience.id ? (
                                 <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                               ) : (
                                 <Trash2 className="w-5 h-5" />
@@ -298,14 +298,14 @@ export default function ListingsPage() {
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <DeleteConfirmationModal
-          title="Delete Tour"
-          message={`Are you sure you want to delete "${listingToDelete?.title}"? This action cannot be undone.`}
+          title="Delete Experience"
+          message={`Are you sure you want to delete "${experienceToDelete?.title}"? This action cannot be undone.`}
           isOpen={deleteModalOpen}
           isLoading={!!deleteLoading}
           onConfirm={handleDelete}
           onCancel={() => {
             setDeleteModalOpen(false)
-            setListingToDelete(null)
+            setExperienceToDelete(null)
           }}
         />
       )}

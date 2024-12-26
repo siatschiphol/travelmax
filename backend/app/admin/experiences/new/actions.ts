@@ -19,19 +19,27 @@ export async function createTour(tourData: any) {
     const userId = sessionResponse.data.session.user.id;
     console.log('Creating tour as user:', userId);
 
-    // Prepare the listing data with title and created_by
-    const listingDataWithUser = {
-      ...tourData,
-      created_by: userId,
-      title: tourData.title || 'Untitled Tour' // Ensure title is set
+    // Prepare the experience data with all fields inside details
+    const experienceData = {
+      details: {
+        ...tourData.details,
+        created_by: userId,
+        title: tourData.title || 'Untitled Tour',
+        slug: tourData.slug,
+        status: tourData.status
+      },
+      timestamps: {
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
     };
 
-    console.log('Creating listing with data:', listingDataWithUser);
+    console.log('Creating experience with data:', experienceData);
 
-    // Insert the tour with created_by field
+    // Insert the experience
     const { data, error: insertError } = await supabase
       .from('experiences')
-      .insert([listingDataWithUser])
+      .insert([experienceData])
       .select()
       .single();
 
@@ -40,9 +48,9 @@ export async function createTour(tourData: any) {
       return { success: false, error: insertError.message };
     }
 
-    console.log('Created listing:', data);
+    console.log('Created experience:', data);
 
-    revalidatePath('/admin/listings');
+    revalidatePath('/admin/experiences');
     return { success: true, data };
   } catch (error: any) {
     console.error('Error in createTour:', error);

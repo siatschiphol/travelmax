@@ -4,8 +4,8 @@ CREATE TYPE listing_type AS ENUM ('tour', 'event');
 -- Create enum for listing status
 CREATE TYPE listing_status AS ENUM ('draft', 'published', 'archived');
 
--- Create the listings table
-CREATE TABLE listings (
+-- Create the experiences table
+CREATE TABLE experiences (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
@@ -62,11 +62,11 @@ CREATE TABLE listings (
 );
 
 -- Create index for faster JSON queries
-CREATE INDEX idx_tour_details ON listings USING GIN (tour_details);
-CREATE INDEX idx_event_details ON listings USING GIN (event_details);
+CREATE INDEX idx_tour_details ON experiences USING GIN (tour_details);
+CREATE INDEX idx_event_details ON experiences USING GIN (event_details);
 
 -- Create index for listing type and status
-CREATE INDEX idx_listing_type_status ON listings (type, status);
+CREATE INDEX idx_listing_type_status ON experiences (type, status);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -78,8 +78,8 @@ END;
 $$ language 'plpgsql';
 
 -- Create trigger to automatically update updated_at
-CREATE TRIGGER update_listings_updated_at
-    BEFORE UPDATE ON listings
+CREATE TRIGGER update_experiences_updated_at
+    BEFORE UPDATE ON experiences
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
@@ -112,43 +112,55 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_listing_slug
-    BEFORE INSERT OR UPDATE ON listings
+CREATE TRIGGER set_experience_slug
+    BEFORE INSERT OR UPDATE ON experiences
     FOR EACH ROW
     EXECUTE FUNCTION set_slug_if_empty();
 
--- Add RLS (Row Level Security) policies
-ALTER TABLE listings ENABLE ROW LEVEL SECURITY;
+-- Enable RLS
+ALTER TABLE experiences ENABLE ROW LEVEL SECURITY;
 
--- Policy for viewing published listings (public)
-CREATE POLICY "View published listings" ON listings
-    FOR SELECT
-    USING (status = 'published');
+-- Drop any existing policies
+DROP POLICY IF EXISTS "View published experiences" ON experiences;
+DROP POLICY IF EXISTS "View own experiences" ON experiences;
+DROP POLICY IF EXISTS "Insert own experiences" ON experiences;
+DROP POLICY IF EXISTS "Update own experiences" ON experiences;
+DROP POLICY IF EXISTS "Delete own experiences" ON experiences;
+DROP POLICY IF EXISTS "Enable read access for all users" ON experiences;
+DROP POLICY IF EXISTS "Enable insert access for authenticated users only" ON experiences;
+DROP POLICY IF EXISTS "Enable update access for owners only" ON experiences;
+DROP POLICY IF EXISTS "Enable delete access for owners only" ON experiences;
+DROP POLICY IF EXISTS "Enable read for all users" ON experiences;
+DROP POLICY IF EXISTS "Enable insert for authenticated users" ON experiences;
+DROP POLICY IF EXISTS "Enable update for owners and admins" ON experiences;
+DROP POLICY IF EXISTS "Enable delete for owners and admins" ON experiences;
 
--- Policy for listing owners to view all their listings
-CREATE POLICY "View own listings" ON listings
-    FOR SELECT
-    USING (created_by = auth.uid());
+-- Create simple policies without user_profiles dependency
+CREATE POLICY "Public read access" ON experiences
+    FOR SELECT USING (
+        status = 'published' OR -- Anyone can read published experiences
+        auth.uid() = created_by -- Owners can read their own experiences
+    );
 
--- Policy for listing owners to insert their listings
-CREATE POLICY "Insert own listings" ON listings
-    FOR INSERT
-    WITH CHECK (created_by = auth.uid());
+CREATE POLICY "Authenticated insert access" ON experiences
+    FOR INSERT WITH CHECK (
+        auth.uid() = created_by AND -- Only allow setting created_by to the current user
+        auth.role() = 'authenticated'
+    );
 
--- Policy for listing owners to update their listings
-CREATE POLICY "Update own listings" ON listings
-    FOR UPDATE
-    USING (created_by = auth.uid())
-    WITH CHECK (created_by = auth.uid());
+CREATE POLICY "Owner update access" ON experiences
+    FOR UPDATE USING (
+        auth.uid() = created_by -- Only owners can update their experiences
+    );
 
--- Policy for listing owners to delete their listings
-CREATE POLICY "Delete own listings" ON listings
-    FOR DELETE
-    USING (created_by = auth.uid());
+CREATE POLICY "Owner delete access" ON experiences
+    FOR DELETE USING (
+        auth.uid() = created_by -- Only owners can delete their experiences
+    );
 
 -- Example of how to insert a tour listing
-COMMENT ON TABLE listings IS 'Example insert for a tour:
-INSERT INTO listings (
+COMMENT ON TABLE experiences IS 'Example insert for a tour:
+INSERT INTO experiences (
     title,
     type,
     status,

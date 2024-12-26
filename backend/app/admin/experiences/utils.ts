@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/client'
 
-export async function uploadTourImages(images: File[]) {
+export async function uploadExperienceImages(images: File[]) {
   const supabase = createClient()
   const imageUrls: string[] = []
 

@@ -1,4 +1,4 @@
-import { Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -13,9 +13,10 @@ export const metadata = {
   description: "Modern Analytics Dashboard with Sales Overview",
 };
 
-const geistSans = Geist({
-  display: "swap",
+const inter = Inter({
   subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
 });
 
 export default function RootLayout({
@@ -24,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={geistSans.className} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} font-sans`} suppressHydrationWarning>
       <body className="bg-gray-50">
         <ThemeProvider
           attribute="class"

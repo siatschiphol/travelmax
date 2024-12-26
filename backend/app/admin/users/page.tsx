@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { Building, Filter, Lock, Mail, MoreHorizontal, Phone, Plus, Search, Shield, User, X } from 'lucide-react'
 import Image from 'next/image'
+import AdminModal from './components/AdminModal'
+import PartnerModal from './components/PartnerModal'
+import StaffModal from './components/StaffModal'
+import UserModal from './components/UserModal'
 
 interface UserData {
   id: string
@@ -51,7 +55,11 @@ const mockUsers: UserData[] = [
 ]
 
 export default function UsersPage() {
-  const [showNewUser, setShowNewUser] = useState(false)
+  const [showNewUserMenu, setShowNewUserMenu] = useState(false)
+  const [showAdminModal, setShowAdminModal] = useState(false)
+  const [showPartnerModal, setShowPartnerModal] = useState(false)
+  const [showStaffModal, setShowStaffModal] = useState(false)
+  const [showUserModal, setShowUserModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -106,13 +114,56 @@ export default function UsersPage() {
           <h1 className="text-2xl font-bold">Users & Staff</h1>
           <p className="text-gray-500">Manage user accounts and permissions</p>
         </div>
-        <button
-          onClick={() => setShowNewUser(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          <Plus className="w-4 h-4" />
-          Add User
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setShowNewUserMenu(!showNewUserMenu)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          >
+            <Plus className="w-4 h-4" />
+            Add User
+          </button>
+          
+          {showNewUserMenu && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+              <button
+                onClick={() => {
+                  setShowNewUserMenu(false)
+                  setShowAdminModal(true)
+                }}
+                className="w-full px-4 py-2 text-left hover:bg-gray-50"
+              >
+                Create New Admin
+              </button>
+              <button
+                onClick={() => {
+                  setShowNewUserMenu(false)
+                  setShowPartnerModal(true)
+                }}
+                className="w-full px-4 py-2 text-left hover:bg-gray-50"
+              >
+                Create New Partner
+              </button>
+              <button
+                onClick={() => {
+                  setShowNewUserMenu(false)
+                  setShowStaffModal(true)
+                }}
+                className="w-full px-4 py-2 text-left hover:bg-gray-50"
+              >
+                Create New Staff
+              </button>
+              <button
+                onClick={() => {
+                  setShowNewUserMenu(false)
+                  setShowUserModal(true)
+                }}
+                className="w-full px-4 py-2 text-left hover:bg-gray-50"
+              >
+                Create New App User
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -294,80 +345,41 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {showNewUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Add New User</h2>
-              <button
-                onClick={() => setShowNewUser(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <form className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Full Name</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter full name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <input
-                  type="email"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter email address"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Role</label>
-                <select className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="">Select role</option>
-                  <option value="admin">Admin</option>
-                  <option value="staff">Staff</option>
-                  <option value="supplier">Supplier</option>
-                  <option value="customer">Customer</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Phone (Optional)</label>
-                <input
-                  type="tel"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter phone number"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Company (Optional)</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter company name"
-                />
-              </div>
-              <div className="flex gap-4 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowNewUser(false)}
-                  className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                >
-                  Add User
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <AdminModal
+        isOpen={showAdminModal}
+        onClose={() => setShowAdminModal(false)}
+        onSubmit={(data) => {
+          console.log('Admin data:', data)
+          setShowAdminModal(false)
+        }}
+      />
+
+      <PartnerModal
+        isOpen={showPartnerModal}
+        onClose={() => setShowPartnerModal(false)}
+        onSubmit={(data) => {
+          console.log('Partner data:', data)
+          setShowPartnerModal(false)
+        }}
+      />
+
+      <StaffModal
+        isOpen={showStaffModal}
+        onClose={() => setShowStaffModal(false)}
+        onSubmit={(data) => {
+          console.log('Staff data:', data)
+          setShowStaffModal(false)
+        }}
+      />
+
+      <UserModal
+        isOpen={showUserModal}
+        onClose={() => setShowUserModal(false)}
+        onSubmit={(data) => {
+          console.log('User data:', data)
+          setShowUserModal(false)
+        }}
+      />
     </div>
   )
 }

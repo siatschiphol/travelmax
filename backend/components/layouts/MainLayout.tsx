@@ -6,6 +6,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { useAuth } from '@/contexts/AuthContext'
+import { SidebarProvider } from '@/contexts/SidebarContext'
 
 export default function MainLayout({
   children,
@@ -37,17 +38,17 @@ export default function MainLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1">
-        <div className="ml-60 min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-1 p-8 max-w-7xl mx-auto w-full">
+    <SidebarProvider>
+      <div className="min-h-screen bg-gray-50">
+        <Sidebar />
+        <Header />
+        <main className="px-8 ml-16 mt-16 mb-16">
+          <div className="max-w-6xl mx-auto py-8">
             {children}
-          </main>
-          <Footer />
-        </div>
+          </div>
+        </main>
+        <Footer />
       </div>
-    </div>
+    </SidebarProvider>
   )
 }

@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import TourFormWrapper from '../../components/TourFormWrapper'
+import TourFormWrapper from '../../new/components/TourFormWrapper'
 
 interface PageProps {
   params: Promise<{ id: string }>

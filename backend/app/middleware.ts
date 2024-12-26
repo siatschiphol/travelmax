@@ -30,23 +30,27 @@ export async function middleware(request: NextRequest) {
 
   // If user is not signed in and the current path starts with /admin
   if (!session && request.nextUrl.pathname.startsWith('/admin')) {
-    const redirectUrl = new URL('/login', request.url)
-    redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
-    return NextResponse.redirect(redirectUrl)
+    // Get the intended destination
+    const redirectTo = request.nextUrl.pathname
+    // Create the login URL with the redirectTo parameter
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('redirectTo', redirectTo)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  // If user is signed in and tries to access login/signup pages
+  if (session && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/sign-up')) {
+    return NextResponse.redirect(new URL('/admin/dashboard', request.url))
   }
 
   return response
 }
 
+// Specify which routes this middleware will run on
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    '/admin/:path*',
+    '/login',
+    '/sign-up',
   ],
 }
