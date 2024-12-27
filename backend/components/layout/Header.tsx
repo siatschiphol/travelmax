@@ -79,145 +79,175 @@ export default function Header() {
   }
 
   return (
-    <header className={`fixed top-0 right-0 left-0 transition-all duration-300 z-10 ml-16 h-16 border-b ${
-      isDark 
-        ? 'bg-secondary-800/80 border-secondary-700/50 text-secondary-50' 
-        : 'bg-white/80 border-secondary-200/80 text-secondary-900'
-    } backdrop-blur-sm`}>
-      <div className="h-16 px-8">
-        <div className="max-w-6xl mx-auto h-full flex items-center justify-between">
-          <div className="flex-1 max-w-2xl">
-            <div>
-              <h1 className={`text-xl font-bold ${isDark ? 'text-secondary-50' : 'text-secondary-900'}`}>
-                {getHeaderTitle()}
-              </h1>
-              <p className={`text-sm ${isDark ? 'text-secondary-400' : 'text-secondary-500'}`}>
-                {getHeaderDescription()}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-                isDark ? 'text-secondary-400' : 'text-secondary-400'
-              }`} />
-              <input
-                type="text"
-                placeholder="Search..."
-                className={`w-64 pl-10 pr-4 py-2 text-sm rounded-lg transition-all focus:outline-none focus:ring-2 ${
-                  isDark 
-                    ? 'bg-secondary-900/50 border-secondary-700 text-secondary-100 placeholder-secondary-500 focus:ring-primary-500/20 focus:border-primary-500/30' 
-                    : 'bg-secondary-50/80 border-secondary-200 text-secondary-900 placeholder-secondary-400 focus:ring-primary-500/20 focus:border-primary-500/30'
-                } border focus:bg-opacity-100`}
-              />
+    <>
+      <style jsx>{`
+        #header-search {
+          background-color: #f4f4f4 !important;
+        }
+        #header-search:focus {
+          background-color: #f4f4f4 !important;
+        }
+      `}</style>
+      <header className={`fixed top-0 right-0 left-0 z-10 ml-16 h-16 bg-white transition-colors duration-200 ${
+        isDark && 'bg-gray-900'
+      } shadow-sm backdrop-blur-sm`}>
+        <div className="h-16 px-8">
+          <div className="max-w-6xl mx-auto h-full flex items-center justify-between gap-8">
+            {/* Search Bar */}
+            <div className="flex-1 max-w-xl relative">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search anything..."
+                  id="header-search"
+                  className={`w-full pl-11 pr-4 py-2 text-sm rounded-full transition-colors focus:outline-none ${
+                    isDark 
+                      ? 'text-gray-100 placeholder-gray-500 focus:ring-1 focus:ring-blue-500' 
+                      : 'text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-blue-500'
+                  }`}
+                />
+              </div>
             </div>
 
-            <button 
-              onClick={() => setTheme(isDark ? 'light' : 'dark')}
-              className={`p-2 rounded-lg transition-colors ${
-                isDark 
-                  ? 'hover:bg-secondary-700/50 text-secondary-400 hover:text-secondary-200' 
-                  : 'hover:bg-secondary-100 text-secondary-500 hover:text-secondary-700'
-              }`}
-            >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
+            {/* Right side - Navigation and User Menu */}
+            <div className="flex items-center gap-6">
+              {/* Main Navigation */}
+              <nav className="hidden md:flex items-center gap-6">
+                <button
+                  onClick={() => router.push('/admin/dashboard')}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                    pathname.startsWith('/admin/dashboard')
+                      ? isDark ? 'text-blue-400' : 'text-blue-600'
+                      : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Menu className="w-4 h-4" />
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => router.push('/admin/profile')}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                    pathname.startsWith('/admin/profile')
+                      ? isDark ? 'text-blue-400' : 'text-blue-600'
+                      : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <User className="w-4 h-4" />
+                  Profile
+                </button>
+                <button
+                  onClick={() => router.push('/admin/reviews')}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                    pathname.startsWith('/admin/reviews')
+                      ? isDark ? 'text-blue-400' : 'text-blue-600'
+                      : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Bell className="w-4 h-4" />
+                  Reviews
+                </button>
+                <button
+                  onClick={() => router.push('/admin/settings')}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                    pathname.startsWith('/admin/settings')
+                      ? isDark ? 'text-blue-400' : 'text-blue-600'
+                      : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </button>
+              </nav>
 
-            <button className={`p-2 rounded-lg relative group transition-colors ${
-              isDark 
-                ? 'hover:bg-secondary-700/50 text-secondary-400 hover:text-secondary-200' 
-                : 'hover:bg-secondary-100 text-secondary-500 hover:text-secondary-700'
-            }`}>
-              <Bell className="w-5 h-5" />
-              <span className={`absolute top-1 right-1 w-2 h-2 rounded-full ring-2 ${
-                isDark 
-                  ? 'bg-primary-400 ring-secondary-800' 
-                  : 'bg-primary-500 ring-white'
-              }`} />
-            </button>
-
-            <div className="relative ml-2">
+              {/* Theme Toggle */}
               <button 
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className={`flex items-center gap-3 p-1.5 rounded-lg group transition-colors ${
+                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                className={`p-2 rounded-lg transition-colors ${
                   isDark 
-                    ? 'hover:bg-secondary-700/50' 
-                    : 'hover:bg-secondary-100'
+                    ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  isDark 
-                    ? 'bg-primary-500/10 text-primary-400' 
-                    : 'bg-primary-50 text-primary-600'
-                }`}>
-                  <User className="w-5 h-5" />
-                </div>
-                <div className="hidden md:block text-left">
-                  <p className={`text-sm font-medium ${
-                    isDark 
-                      ? 'text-secondary-100 group-hover:text-secondary-50' 
-                      : 'text-secondary-700 group-hover:text-secondary-900'
-                  }`}>
-                    {user?.email?.split('@')[0]}
-                  </p>
-                  <p className={`text-xs ${isDark ? 'text-secondary-400' : 'text-secondary-500'}`}>
-                    {getUserRole()}
-                  </p>
-                </div>
-                <Menu className={`w-4 h-4 ${
-                  isDark 
-                    ? 'text-secondary-400 group-hover:text-secondary-200' 
-                    : 'text-secondary-400 group-hover:text-secondary-600'
-                }`} />
+                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
 
-              {showUserMenu && (
-                <div className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-1 border ${
-                  isDark 
-                    ? 'bg-secondary-800 border-secondary-700' 
-                    : 'bg-white border-secondary-200/80'
-                }`}>
-                  <button
-                    onClick={() => router.push(getProfilePath())}
-                    className={`w-full px-4 py-2 text-sm flex items-center gap-2 ${
-                      isDark 
-                        ? 'text-secondary-100 hover:bg-secondary-700/50' 
-                        : 'text-secondary-700 hover:bg-secondary-50'
-                    }`}
-                  >
-                    <User className="w-4 h-4" />
-                    Profile
-                  </button>
-                  <button
-                    onClick={() => router.push(getSettingsPath())}
-                    className={`w-full px-4 py-2 text-sm flex items-center gap-2 ${
-                      isDark 
-                        ? 'text-secondary-100 hover:bg-secondary-700/50' 
-                        : 'text-secondary-700 hover:bg-secondary-50'
-                    }`}
-                  >
-                    <Settings className="w-4 h-4" />
-                    Settings
-                  </button>
-                  <hr className={isDark ? 'border-secondary-700' : 'border-secondary-200/80'} />
-                  <button
-                    onClick={handleSignOut}
-                    className={`w-full px-4 py-2 text-sm flex items-center gap-2 ${
-                      isDark 
-                        ? 'text-error-400 hover:bg-secondary-700/50' 
-                        : 'text-error-600 hover:bg-secondary-50'
-                    }`}
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign out
-                  </button>
-                </div>
-              )}
+              {/* User Menu */}
+              <div className="relative">
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className={`flex items-center gap-2 p-1.5 rounded-lg transition-colors ${
+                    isDark 
+                      ? 'hover:bg-gray-800' 
+                      : 'hover:bg-gray-100'
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    isDark 
+                      ? 'bg-gray-800 text-blue-400' 
+                      : 'bg-blue-50 text-blue-600'
+                  }`}>
+                    <User className="w-5 h-5" />
+                  </div>
+                  <div className="hidden md:block text-left">
+                    <p className={`text-sm font-medium ${
+                      isDark ? 'text-gray-200' : 'text-gray-700'
+                    }`}>
+                      {user?.email?.split('@')[0]}
+                    </p>
+                    <p className={`text-xs ${
+                      isDark ? 'text-gray-500' : 'text-gray-500'
+                    }`}>
+                      {getUserRole()}
+                    </p>
+                  </div>
+                </button>
+
+                {showUserMenu && (
+                  <div className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-1 ${
+                    isDark ? 'bg-gray-900 border border-gray-800' : 'bg-white'
+                  }`}>
+                    <button
+                      onClick={() => router.push(getProfilePath())}
+                      className={`w-full px-4 py-2 text-sm flex items-center gap-2 ${
+                        isDark 
+                          ? 'text-gray-300 hover:bg-gray-800' 
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <User className="w-4 h-4" />
+                      Profile
+                    </button>
+                    <button
+                      onClick={() => router.push(getSettingsPath())}
+                      className={`w-full px-4 py-2 text-sm flex items-center gap-2 ${
+                        isDark 
+                          ? 'text-gray-300 hover:bg-gray-800' 
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Settings className="w-4 h-4" />
+                      Settings
+                    </button>
+                    <hr className={isDark ? 'border-gray-800' : 'border-gray-200'} />
+                    <button
+                      onClick={handleSignOut}
+                      className={`w-full px-4 py-2 text-sm flex items-center gap-2 ${
+                        isDark 
+                          ? 'text-red-400 hover:bg-gray-800' 
+                          : 'text-red-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   )
 }

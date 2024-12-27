@@ -22,6 +22,9 @@ const config = {
         sans: ["var(--font-inter)"],
       },
       colors: {
+        gray: {
+          50: 'rgb(243, 247, 255)',
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -57,9 +60,9 @@ const config = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "4px",
+        md: "4px",
+        sm: "4px",
       },
       keyframes: {
         "accordion-down": {

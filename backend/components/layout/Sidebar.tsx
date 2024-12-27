@@ -187,7 +187,7 @@ export default function Sidebar() {
               className="flex items-center gap-3 px-3 py-2 w-full text-left rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-slate-100"
             >
               <Shield className="w-5 h-5" />
-              <span className={`truncate transition-all duration-300 ${isCollapsed ? 'hidden group-hover:block' : ''}`}>
+              <span className={`truncate text-sm transition-all duration-300 ${isCollapsed ? 'hidden group-hover:block' : ''}`}>
                 Back to Admin
               </span>
             </Link>
@@ -212,7 +212,7 @@ export default function Sidebar() {
                     }`}
                   >
                     <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-400 group-hover:text-slate-100'}`} />
-                    <span className={`truncate transition-all duration-300 ${isCollapsed ? 'hidden group-hover:block' : ''}`}>
+                    <span className={`truncate text-sm transition-all duration-300 ${isCollapsed ? 'hidden group-hover:block' : ''}`}>
                       {item.label}
                     </span>
                     {!isCollapsed && (
@@ -234,7 +234,7 @@ export default function Sidebar() {
                     }`}
                   >
                     <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-400 group-hover:text-slate-100'}`} />
-                    <span className={`truncate transition-all duration-300 ${isCollapsed ? 'hidden group-hover:block' : ''}`}>
+                    <span className={`truncate text-sm transition-all duration-300 ${isCollapsed ? 'hidden group-hover:block' : ''}`}>
                       {item.label}
                     </span>
                     {isActive && (
@@ -298,7 +298,7 @@ export default function Sidebar() {
                   }`}
                 >
                   <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-teal-400' : 'text-slate-400 group-hover:text-slate-100'}`} />
-                  <span className={`truncate transition-all duration-300 ${isCollapsed ? 'hidden group-hover:block' : ''}`}>
+                  <span className={`truncate text-sm transition-all duration-300 ${isCollapsed ? 'hidden group-hover:block' : ''}`}>
                     {item.label}
                   </span>
                 </Link>

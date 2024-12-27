@@ -4,7 +4,6 @@ import { Activity, TrendingUp, Users, DollarSign, ArrowUpRight, ArrowDownRight, 
 import dynamic from 'next/dynamic'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { useState } from 'react'
-import { TravelmaxLogo } from '../logo/TravelmaxLogo'
 
 const AreaChartComponent = dynamic(
   () => import('./AreaChartWrapper').then((mod) => mod.AreaChartComponent),
@@ -207,19 +206,16 @@ export default function DashboardContent({ user }: Props) {
     <div className="space-y-8">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <div className="space-y-4">
-          <TravelmaxLogo size="large" className="mb-2" />
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800">Welcome back, {user?.email}</h2>
-            <p className="text-gray-500 mt-1">Here's what's happening with your business today.</p>
-          </div>
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-800">Welcome back, {user?.email}</h2>
+          <p className="text-gray-500 mt-1">Here's what's happening with your business today.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <input
               type="text"
               placeholder="Search..."
-              className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full md:w-64"
+              className="pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full md:w-64"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -228,7 +224,7 @@ export default function DashboardContent({ user }: Props) {
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
           >
             <option value="Daily">Daily</option>
             <option value="Weekly">Weekly</option>
@@ -264,9 +260,9 @@ export default function DashboardContent({ user }: Props) {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Area Chart */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">Revenue Overview</h3>
@@ -287,17 +283,17 @@ export default function DashboardContent({ user }: Props) {
         </div>
 
         {/* Donut Chart */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="lg:col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center justify-between mb-2">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">Top Products</h3>
-              <p className="text-sm text-gray-500 mt-1">Best performing products</p>
+              <p className="text-sm text-gray-500 mt-0.5">Best performing products</p>
             </div>
             <button className="p-2 hover:bg-gray-50 rounded-lg">
               <MoreHorizontal className="w-5 h-5 text-gray-500" />
             </button>
           </div>
-          <div className="h-80">
+          <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -317,7 +313,7 @@ export default function DashboardContent({ user }: Props) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-6 space-y-4">
+          <div className="mt-2 space-y-2">
             {products.map((product, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -343,7 +339,7 @@ export default function DashboardContent({ user }: Props) {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                className="px-4 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
               >
                 <option value="All">All Status</option>
                 <option value="Success">Success</option>

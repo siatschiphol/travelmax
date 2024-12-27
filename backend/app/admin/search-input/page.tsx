@@ -42,7 +42,7 @@ export default function SearchPage() {
             <input
               type="text"
               placeholder="Search for anything..."
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-12 pr-4 py-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <button className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50">
